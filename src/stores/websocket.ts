@@ -1,20 +1,20 @@
-import { ref, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import { useGameStore } from './game'
 
-const ws = ref<WebSocket | null>(null)
-const isConnected = ref(false)
-const playerId = ref<string | null>(null)
+// 从环境变量获取 WebSocket URL，Vercel 部署时会使用这个
+const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL || 'ws://localhost:8080'
 
-export function useWebSocket() {
+export const useWebSocketStore = () => {
+  const ws = ref<WebSocket | null>(null)
+  const isConnected = ref(false)
   const gameStore = useGameStore()
 
   const connect = () => {
-    if (ws.value) {
-      ws.value.close()
+    if (ws.value && ws.value.readyState === WebSocket.OPEN) {
+      return
     }
 
-    // 连接到 WebSocket 服务器
-    ws.value = new WebSocket('ws://localhost:8080')
+    ws.value = new WebSocket(WEBSOCKET_URL)
     
     ws.value.onopen = () => {
       console.log('WebSocket connected')
@@ -23,13 +23,14 @@ export function useWebSocket() {
 
     ws.value.onmessage = (event) => {
       const message = JSON.parse(event.data)
-      handleMessage(message)
+      handleServerMessage(message)
     }
 
     ws.value.onclose = () => {
       console.log('WebSocket disconnected')
       isConnected.value = false
-      setTimeout(connect, 3000) // 重连
+      // 尝试重连
+      setTimeout(connect, 3000)
     }
 
     ws.value.onerror = (error) => {
@@ -37,62 +38,22 @@ export function useWebSocket() {
     }
   }
 
-  const send = (message: any) => {
+  const disconnect = () => {
+    if (ws.value) {
+      ws.value.close()
+    }
+  }
+
+  const sendMessage = (message: any) => {
     if (ws.value && ws.value.readyState === WebSocket.OPEN) {
       ws.value.send(JSON.stringify(message))
     }
   }
 
-  const setPlayerName = (name: string) => {
-    send({
-      type: 'set_player_name',
-      name: name
-    })
-  }
-
-  const createRoom = () => {
-    send({
-      type: 'create_room'
-    })
-  }
-
-  const joinRoom = (roomId: string) => {
-    send({
-      type: 'join_room',
-      roomId: roomId
-    })
-  }
-
-  const getRooms = () => {
-    send({
-      type: 'get_rooms'
-    })
-  }
-
-  const callLandlord = (wantsToBe: boolean) => {
-    send({
-      type: 'call_landlord',
-      wantsToBeLandlord: wantsToBe
-    })
-  }
-
-  const playCards = (cards: string[]) => {
-    send({
-      type: 'play_cards',
-      cards: cards
-    })
-  }
-
-  const passTurn = () => {
-    send({
-      type: 'pass_turn'
-    })
-  }
-
-  const handleMessage = (message: any) => {
+  const handleServerMessage = (message: any) => {
     switch (message.type) {
       case 'connected':
-        playerId.value = message.playerId
+        gameStore.setPlayerId(message.playerId)
         break
       case 'room_created':
         gameStore.setCurrentRoom(message.roomId)
@@ -115,11 +76,13 @@ export function useWebSocket() {
         gameStore.setBottomCards(message.bottomCards)
         break
       case 'cards_played':
+        gameStore.playCards(message.cards)
         gameStore.setGameState(message.gameState)
         gameStore.setCurrentPlayerId(message.currentPlayerId)
         gameStore.setLastPlayedCards(message.lastPlayedCards)
         break
       case 'turn_passed':
+        gameStore.passTurn()
         gameStore.setGameState(message.gameState)
         gameStore.setCurrentPlayerId(message.currentPlayerId)
         gameStore.setLastPlayedCards(message.lastPlayedCards)
@@ -128,32 +91,18 @@ export function useWebSocket() {
         gameStore.setWinnerId(message.winnerId)
         gameStore.setScores(message.scores)
         break
-      case 'rooms_list':
-        gameStore.setAvailableRooms(message.rooms)
-        break
       case 'error':
         console.error('Server error:', message.message)
-        alert(message.message)
         break
+      default:
+        console.log('Unknown message type:', message.type)
     }
   }
 
-  onUnmounted(() => {
-    if (ws.value) {
-      ws.value.close()
-    }
-  })
-
   return {
     isConnected,
-    playerId,
     connect,
-    setPlayerName,
-    createRoom,
-    joinRoom,
-    getRooms,
-    callLandlord,
-    playCards,
-    passTurn
+    disconnect,
+    sendMessage
   }
 }
