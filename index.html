@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI斗地主 - 三个智能玩家对战</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .players-area {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+        .player {
+            text-align: center;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            width: 30%;
+        }
+        .current-player {
+            border-color: #ff6b6b;
+            background-color: #fff5f5;
+        }
+        .cards-display {
+            min-height: 80px;
+            margin-top: 10px;
+        }
+        .card {
+            display: inline-block;
+            width: 40px;
+            height: 60px;
+            margin: 2px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            line-height: 60px;
+            font-weight: bold;
+            box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        .landlord {
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            color: #333;
+        }
+        .game-controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            background: #667eea;
+            color: white;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+        .stats {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🤖 AI斗地主</h1>
+            <p>三个智能AI玩家自动对战，观察它们的策略！</p>
+        </div>
+        
+        <div class="players-area">
+            <div class="player" id="player1">
+                <h3>进攻型AI</h3>
+                <div class="cards-display" id="cards1"></div>
+            </div>
+            <div class="player current-player" id="player2">
+                <h3>防守型AI <span class="badge">地主</span></h3>
+                <div class="cards-display" id="cards2"></div>
+            </div>
+            <div class="player" id="player3">
+                <h3>平衡型AI</h3>
+                <div class="cards-display" id="cards3"></div>
+            </div>
+        </div>
+        
+        <div class="game-controls">
+            <button onclick="startNewGame()">开始新游戏</button>
+            <button onclick="autoPlay()">自动对战</button>
+        </div>
+        
+        <div class="stats">
+            <h4>游戏统计</h4>
+            <p>当前局数: <span id="gameCount">0</span> | 地主胜率: <span id="landlordWinRate">0%</span></p>
+        </div>
+    </div>
+
+    <script>
+        // 游戏核心逻辑将在这里实现
+        console.log("AI斗地主游戏加载中...");
+        
+        function startNewGame() {
+            alert("新游戏功能将在完整版本中实现！");
+        }
+        
+        function autoPlay() {
+            alert("自动对战功能将在完整版本中实现！");
+        }
+    </script>
+</body>
+</html>
